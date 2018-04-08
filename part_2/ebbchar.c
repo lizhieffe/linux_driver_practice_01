@@ -3,7 +3,9 @@
 #include <linux/device.h>         // Header to support the kernel Driver Model
 #include <linux/kernel.h>         // Contains types, macros, functions for the kernel
 #include <linux/fs.h>             // Header for the Linux file system support
+#include <linux/mutex.h>
 #include <linux/uaccess.h>          // Required for the copy to user function
+
 #define  DEVICE_NAME "ebbchar"    ///< The device will appear at /dev/ebbchar using this value
 #define  CLASS_NAME  "ebb"        ///< The device class -- this is a character device driver
 
@@ -18,6 +20,8 @@ static short size_of_message;
 static int numberOpens = 0;  // Count the number of times the device is opened.
 static struct class * ebbcharClass = NULL;  // The device-driver class struct pointer
 static struct class * ebbcharDevice = NULL;  // The device-driver device struct pointer
+
+static DEFINE_MUTEX(ebbchar_mutex);  // Guard that only one caller can access the device.
 
 // Protoype functions for the character device -- must come before the struct definition
 static int dev_open(struct inode *, struct file *);
@@ -72,6 +76,9 @@ static int __init ebbchar_init(void){
   }
 
   printk(KERN_INFO "EBBChar: device class created correctly\n"); // Made it! device was initialized
+
+  mutex_init(&ebbchar_mutex);
+
   return 0;
 }
 
@@ -85,6 +92,8 @@ static void __exit ebbchar_exit(void){
   class_destroy(ebbcharClass);                             // remove the device class
   unregister_chrdev(majorNumber, DEVICE_NAME);             // unregister the major number
   printk(KERN_INFO "EBBChar: Goodbye from the LKM!\n");
+
+  mutex_destroy(&ebbchar_mutex);
 }
 
 /** @brief The device open function that is called each time the device is opened
@@ -93,6 +102,10 @@ static void __exit ebbchar_exit(void){
  *  @param filep A pointer to a file object (defined in linux/fs.h)
  */
 static int dev_open(struct inode *inodep, struct file *filep) {
+  if (!mutex_trylock(&ebbchar_mutex)) {
+    printk(KERN_ALERT "EBBChar: Device in use by another process");
+    return -EBUSY;
+  }
   numberOpens++;
   printk(KERN_INFO "EBBChar: Device has been opened %d time(s)\n", numberOpens);
   return 0;
@@ -142,6 +155,9 @@ static ssize_t dev_write(struct file *filep, const char *buffer, size_t len, lof
  */
 static int dev_release(struct inode *inodep, struct file *filep) {
   printk(KERN_INFO "EBBChar: Device successfully closed\n");
+
+  mutex_unlock(&ebbchar_mutex);
+
   return 0;
 }
 
