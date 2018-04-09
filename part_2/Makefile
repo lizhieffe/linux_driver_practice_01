@@ -1,10 +1,11 @@
 # a goal definition and define the module to be built (hello.o). The syntax is
 # surprisingly intricate, for example obj-m defines a loadable module goal,
 # whereas obj-y indicates a built-in object goal. 
+
 obj-m+=ebbchar.o
 
 all:
-	make -C /lib/modules/$(shell uname -r)/build/ M=$(PWD) modules
+	make -C /lib/modules/$(shell uname -r)/build/ M=$(PWD) modules -i
 	$(CC) testebbchar.c -o test
 clean:
 	make -C /lib/modules/$(shell uname -r)/build/ M=$(PWD) clean

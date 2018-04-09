@@ -18,8 +18,8 @@ static int majorNumber;  // device major number -- determined automatically
 static char message[256] = {0};  // memory of the string that is passed from user space
 static short size_of_message;
 static int numberOpens = 0;  // Count the number of times the device is opened.
-static struct class * ebbcharClass = NULL;  // The device-driver class struct pointer
-static struct class * ebbcharDevice = NULL;  // The device-driver device struct pointer
+static struct class *ebbcharClass = NULL;  // The device-driver class struct pointer
+static struct device *ebbcharDevice = NULL;  // The device-driver device struct pointer
 
 static DEFINE_MUTEX(ebbchar_mutex);  // Guard that only one caller can access the device.
 
