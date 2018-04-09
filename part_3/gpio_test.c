@@ -1,12 +1,8 @@
 /**
- * @file   gpio_test.c
- * @author Derek Molloy
- * @date   19 April 2015
- * @brief  A kernel module for controlling a GPIO LED/button pair. The device mounts devices via
+ * A kernel module for controlling a GPIO LED/button pair. The device mounts devices via
  * sysfs /sys/class/gpio/gpio115 and gpio49. Therefore, this test LKM circuit assumes that an LED
  * is attached to GPIO 49 which is on P9_23 and the button is attached to GPIO 115 on P9_27. There
  * is no requirement for a custom overlay, as the pins are in their default mux mode states.
- * @see http://www.derekmolloy.ie/
  */
  
 #include <linux/init.h>
@@ -20,7 +16,7 @@ MODULE_AUTHOR("Derek Molloy");
 MODULE_DESCRIPTION("A Button/LED test driver for the BBB");
 MODULE_VERSION("0.1");
 
-static unsigned int gpioLED = 49;
+static unsigned int gpioLED = 24;
 static unsigned int gpioButton = 115;
 static unsigned int irqNumber;
 static unsigned int numberPresses = 0;
@@ -92,7 +88,7 @@ static void __exit ebbgpio_exit(void){
 
 static irq_handler_t ebbgpio_irq_handler(unsigned int irq, void *dev_id,
                                          struct pt_regs *regs) {
-  ledOn = != ledOn;
+  ledOn = !ledOn;
   gpio_set_value(gpioLED, ledOn);
   printk(KERN_INFO "GPIO_TEST: Interrupt! (button state is %d)\n", gpio_get_value(gpioButton));
   numberPresses++;                         // Global counter, will be outputted when the module is unloaded
