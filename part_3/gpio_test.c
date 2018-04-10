@@ -17,7 +17,7 @@ MODULE_DESCRIPTION("A Button/LED test driver for the BBB");
 MODULE_VERSION("0.1");
 
 static unsigned int gpioLED = 24;
-static unsigned int gpioButton = 115;
+static unsigned int gpioButton = 22;
 static unsigned int irqNumber;
 static unsigned int numberPresses = 0;
 static bool ledOn = false;
