@@ -1,6 +1,8 @@
 Instruction can be found here:
 http://derekmolloy.ie/writing-a-linux-kernel-module-part-1-introduction/
 
+The code is tested on RPI 3 device with Raspbian OS.
+
 # Terminal Commands
 
 ## Build module binary
