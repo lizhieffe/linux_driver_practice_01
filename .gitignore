@@ -7,3 +7,5 @@
 *.cmd
 
 *.swo
+
+*.mod.c
